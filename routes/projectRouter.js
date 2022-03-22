@@ -4,54 +4,66 @@ import { getProjects, createProject, getProjectById, deleteProjectById, updatePr
 const router = express.Router()
 
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     const projects = await getProjects()
     res.json(projects)
   }
   catch (err){
-    res.status(500).json(err)
+    next(err)
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
   const project = await getProjectById(id)
   if (!project.length) {
-    res.status(404).json({ error: `Project with id ${id} not found` })
+    const err = new Error(`Project with id ${id} not found`)
+    err.status = 404
+    next(err)
   } else {
     res.json(project)
   }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   try {
     const result = await createProject(req.body)
     const projectId = result.rows[0].project_id
     res.status(200).json({ projectId, ...req.body })
   }
   catch (err) {
-    res.status(400).json(err)
+    err.status = 400
+    next(err)
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
   const response = await deleteProjectById(id)
   if (response.rowCount) {
     res.status(204).json()
   } else {
-    res.status(404).send("No rows were affected")
+    const err = new Error(`No rows were affected, the project id ${id} might not exist`)
+    err.status = 404
+    next(err)
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  const response = await updateProjectById(id, req.body)
-  if (response.rowCount) {
-    res.status(200).json(req.body)
-  } else {
-    res.status(404).send("No rows were affected")
+  try{
+    const response = await updateProjectById(id, req.body)
+    if (response.rowCount) {
+      res.status(200).json(req.body)
+    } else {
+      const err = new Error(`No rows were affected, the project id ${id} might not exist`)
+      err.status = 404
+      next(err)
+    }
+  }catch(err){
+    err.status = 400
+    next(err)
   }
 })
 
