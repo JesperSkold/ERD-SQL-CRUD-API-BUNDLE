@@ -11,7 +11,7 @@ export const getProjectById = async (id) => {
 }
 
 export const createProject = async (reqBody) => {
-  const response = await query('INSERT INTO project (project_name, project_leader, project_budget) VALUES ($1, $2, $3)', [reqBody.project_name, reqBody.project_leader, reqBody.project_budget])
+  const response = await query('INSERT INTO project (project_name, project_leader, project_budget) VALUES ($1, $2, $3) RETURNING project_id', [reqBody.project_name, reqBody.project_leader, reqBody.project_budget])
   return response
 }
 

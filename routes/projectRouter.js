@@ -12,24 +12,42 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const project = await getProjectById(id)
-  res.json(project)
+  if (!project.length) {
+    res.status(404).json(`Project with id ${id} not found`)
+  } else {
+    res.json(project)
+  }
 })
 
 router.post('/', async (req, res) => {
-  await createProject(req.body)
-  res.json(`Successfully added ${req.body.project_name}`)
+  try {
+    const result = await createProject(req.body)
+    const projectId = result.rows[0].project_id
+    res.status(200).json({projectId, ...req.body})
+  }
+  catch (err) {
+    res.status(400).json(err)
+  }
 })
 
 router.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const response = await deleteProjectById(id)
-  res.json(response)
+  if (response.rowCount) {
+    res.status(204).json()
+  } else {
+    res.status(404).json("No rows were affected")
+  }
 })
 
 router.put('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const response = await updateProjectById(id, req.body)
-  res.json(response)
+  if (response.rowCount) {
+    res.status(200).json(req.body)
+  } else {
+    res.status(404).json("No rows were affected")
+  }
 })
 
 export default router;

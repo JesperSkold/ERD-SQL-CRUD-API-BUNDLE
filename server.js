@@ -12,7 +12,9 @@ const app = express()
 app.use(express.json())
 app.use('/project', projectRouter)
 
-
+app.use( (req, res) => {
+  res.status(404).send("Not found")
+})
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 })
