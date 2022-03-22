@@ -16,13 +16,17 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  const project = await getProjectById(id)
-  if (!project.length) {
-    const err = new Error(`Project with id ${id} not found`)
-    err.status = 404
+  try{
+    const project = await getProjectById(id)
+    if (!project.length) {
+      const err = new Error(`Project with id ${id} not found`)
+      err.status = 404
+      next(err)
+    } else {
+      res.json(project)
+    }
+  }catch(err){
     next(err)
-  } else {
-    res.json(project)
   }
 })
 
@@ -31,8 +35,7 @@ router.post('/', async (req, res, next) => {
     const result = await createProject(req.body)
     const projectId = result.rows[0].project_id
     res.status(200).json({ projectId, ...req.body })
-  }
-  catch (err) {
+  }catch (err) {
     err.status = 400
     next(err)
   }
@@ -40,12 +43,16 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  const response = await deleteProjectById(id)
-  if (response.rowCount) {
-    res.status(204).json()
-  } else {
-    const err = new Error(`No rows were affected, the project id ${id} might not exist`)
-    err.status = 404
+  try{
+    const response = await deleteProjectById(id)
+    if (response.rowCount) {
+      res.status(204).json()
+    } else {
+      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
+      err.status = 404
+      next(err)
+    }
+  }catch(err){
     next(err)
   }
 })
@@ -57,7 +64,7 @@ router.put('/:id', async (req, res, next) => {
     if (response.rowCount) {
       res.status(200).json(req.body)
     } else {
-      const err = new Error(`No rows were affected, the project id ${id} might not exist`)
+      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
       err.status = 404
       next(err)
     }
