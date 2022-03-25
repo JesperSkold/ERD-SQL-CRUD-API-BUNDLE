@@ -1,5 +1,5 @@
 import express from "express";
-import { createEmployee, getEmployee, getEmployeeById } from "../db/employee.js";
+import { createEmployee, getEmployee, getEmployeeById, getProjectByEmployee } from "../db/employee.js";
 
 const router = express.Router()
 
@@ -33,6 +33,22 @@ router.get('/:id', async (req, res, next) => {
       next(err)
     } else {
       res.status(200).json(result)
+    }
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/project', async (req, res, next) => {
+  const id = parseInt(req.params.id)
+  try {
+    const response = await getProjectByEmployee(id)
+    if (!response.length) {
+      const err = new Error(`Employee with id ${id} not found`)
+      err.status = 404
+      next(err)
+    } else {
+      res.status(200).json(response)
     }
   } catch (err) {
     next(err)

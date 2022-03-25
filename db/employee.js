@@ -13,3 +13,8 @@ export const getEmployeeById = async (id) => {
   const response = await query('SELECT * FROM employee WHERE employee_id = $1', [id])
   return response.rows
 }
+
+export const getProjectByEmployee = async (id) => {
+  const response = await query('SELECT * FROM employee_project WHERE employee_id = $1', [id])
+  return response.rows
+}
