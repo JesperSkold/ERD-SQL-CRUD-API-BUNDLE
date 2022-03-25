@@ -1,5 +1,5 @@
 import express from "express";
-import { createEmployee } from "../db/employee.js";
+import { createEmployee, getEmployee, getEmployeeById } from "../db/employee.js";
 
 const router = express.Router()
 
@@ -10,6 +10,31 @@ router.post('/', async (req, res, next) => {
     res.status(200).json({ employeeId, ...req.body })
   } catch (err) {
     err.status = 400
+    next(err)
+  }
+})
+
+router.get('/', async (req, res, next) => {
+  try {
+    const result = await getEmployee()
+    res.status(200).json(result)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id', async (req, res, next) => {
+  const id = parseInt(req.params.id)
+  try {
+    const result = await getEmployeeById(id)
+    if (!result.length) {
+      const err = new Error(`Project with id ${id} not found`)
+      err.status = 404
+      next(err)
+    } else {
+      res.status(200).json(result)
+    }
+  } catch (err) {
     next(err)
   }
 })
