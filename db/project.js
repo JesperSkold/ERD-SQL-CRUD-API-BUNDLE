@@ -25,3 +25,10 @@ export const updateProjectById = async (id, reqBody) => {
   [reqBody.project_name, reqBody.project_leader, reqBody.project_budget, id])
   return response
 }
+
+export const getEmployeesByProject = async (id) => {
+  const response = await query('SELECT * FROM employee_project WHERE project_id = $1', [id])
+  //add param id
+  //need employee name from employee table, need project_id from junc table
+  return response.rows
+}

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById } from '../db/project.js'
+import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById, getEmployeesByProject } from '../db/project.js'
 
 const router = express.Router()
 
@@ -9,14 +9,14 @@ router.get('/', async (req, res, next) => {
     const projects = await getProjects()
     res.json(projects)
   }
-  catch (err){
+  catch (err) {
     next(err)
   }
 })
 
 router.get('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  try{
+  try {
     const project = await getProjectById(id)
     if (!project.length) {
       const err = new Error(`Project with id ${id} not found`)
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res, next) => {
     } else {
       res.json(project)
     }
-  }catch(err){
+  } catch (err) {
     next(err)
   }
 })
@@ -35,7 +35,7 @@ router.post('/', async (req, res, next) => {
     const result = await createProject(req.body)
     const projectId = result.rows[0].project_id
     res.status(200).json({ projectId, ...req.body })
-  }catch (err) {
+  } catch (err) {
     err.status = 400
     next(err)
   }
@@ -43,7 +43,7 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  try{
+  try {
     const response = await deleteProjectById(id)
     if (response.rowCount) {
       res.status(204).json()
@@ -52,14 +52,14 @@ router.delete('/:id', async (req, res, next) => {
       err.status = 404
       next(err)
     }
-  }catch(err){
+  } catch (err) {
     next(err)
   }
 })
 
 router.put('/:id', async (req, res, next) => {
   const id = parseInt(req.params.id)
-  try{
+  try {
     const response = await updateProjectById(id, req.body)
     if (response.rowCount) {
       res.status(200).json(req.body)
@@ -68,8 +68,24 @@ router.put('/:id', async (req, res, next) => {
       err.status = 404
       next(err)
     }
-  }catch(err){
+  } catch (err) {
     err.status = 400
+    next(err)
+  }
+})
+
+router.get('/:id/employee', async (req, res, next) => {
+  const id = parseInt(req.params.id)
+  try {
+    const response = await getEmployeesByProject(id)
+    if (!response.length) {
+      const err = new Error(`Project with id ${id} not found`)
+      err.status = 404
+      next(err)
+    } else {
+      res.status(200).json(response)
+    }
+  } catch (err) {
     next(err)
   }
 })
