@@ -1,5 +1,5 @@
 import express from 'express'
-import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById, getEmployeesByProject } from '../db/project.js'
+import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById, getEmployeesByProject, patchProjectById } from '../db/project.js'
 
 const router = express.Router()
 
@@ -86,6 +86,23 @@ router.get('/:id/employee', async (req, res, next) => {
       res.status(200).json(response)
     }
   } catch (err) {
+    next(err)
+  }
+})
+
+router.patch('/:id', async (req, res, next) => {
+  const id = parseInt(req.params.id)
+  try {
+    const response = await patchProjectById(id, req.body)
+    if (response.rowCount) {
+      res.status(200).json(req.body)
+    } else {
+      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
+      err.status = 404
+      next(err)
+    }
+  } catch (err) {
+    err.status = 400
     next(err)
   }
 })

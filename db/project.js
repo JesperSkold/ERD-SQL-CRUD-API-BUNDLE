@@ -30,3 +30,8 @@ export const getEmployeesByProject = async (id) => {
   const response = await query('SELECT * FROM employee_project WHERE project_id = $1', [id])
   return response.rows
 }
+
+export const patchProjectById = async (id, reqBody) => {
+  const response = await query("UPDATE project SET project_name = COALESCE (NULLIF($1, ''), project_name), project_leader = COALESCE(NULLIF($2, ''), project_leader), project_budget = COALESCE (NULLIF($3, -1), project_budget) WHERE project_id = $4", [reqBody.project_name, reqBody.project_leader, reqBody.project_budget, id])
+  return response
+}
