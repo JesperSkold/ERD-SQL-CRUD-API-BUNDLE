@@ -8,20 +8,6 @@ CREATE TABLE employee (
 employee_id INT GENERATED ALWAYS AS IDENTITY,
 dep_num INT NOT NULL,
 employee_name TEXT NOT NULL,
-CREATE TABLE department (
-dep_num INT GENERATED ALWAYS AS IDENTITY,
-dep_name TEXT NOT NULL,
-PRIMARY KEY(dep_num)
-CREATE TABLE department (
-dep_num INT GENERATED ALWAYS AS IDENTITY,
-dep_name TEXT NOT NULL,
-PRIMARY KEY(dep_num)
-);
-
-CREATE TABLE employee (
-employee_id INT GENERATED ALWAYS AS IDENTITY,
-dep_num INT NOT NULL,
-employee_name TEXT NOT NULL,
 PRIMARY KEY (employee_id), 
 CONSTRAINT fk_department
 	FOREIGN KEY(dep_num)
@@ -46,7 +32,8 @@ CONSTRAINT fk_employee
 CONSTRAINT fk_project
 	FOREIGN KEY(project_id)
 		REFERENCES project(project_id) ON DELETE CASCADE,
-hourly_rate INT NOT NULL
+hourly_rate INT NOT NULL,
+PRIMARY KEY(employee_id, project_id)
 );
 
 INSERT INTO department(dep_name)
