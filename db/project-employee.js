@@ -7,3 +7,8 @@ export const addEmployeeToProject = async (reqBody) => {
   return response
   // return response
 }
+
+export const deleteEmployeeFromProject = async (params) => {
+  const response = await query('DELETE FROM employee_project WHERE employee_id = $1 AND project_id = $2', [params.employee, params.project])
+  return response
+}

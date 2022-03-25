@@ -1,17 +1,29 @@
 import express from "express";
-import { addEmployeeToProject } from "../db/project-employee.js";
+import { addEmployeeToProject, deleteEmployeeFromProject } from "../db/project-employee.js";
 
 const router = express.Router()
 
 router.post('/', async (req, res, next) => {
   try {
-    const result = await addEmployeeToProject(req.body)
-    console.log(result);
-    // const employeeId = result.rows[0].employee_id
-    // const projectId = result.rows[1].project_id
+    await addEmployeeToProject(req.body)
     res.status(200).json(req.body)
   } catch (err) {
     err.status = 400
+    next(err)
+  }
+})
+
+router.delete('/', async (req, res, next) => {
+  try {
+    const result = await deleteEmployeeFromProject(req.query)
+    if (result.rowCount) {
+      res.status(204).json()
+    } else {
+      const err = new Error(`No rows were affected, the project with id ${req.query.project} and employee with id ${req.query.employee} might not exist`)
+      err.status = 404
+      next(err)
+    }
+  } catch (err) {
     next(err)
   }
 })
