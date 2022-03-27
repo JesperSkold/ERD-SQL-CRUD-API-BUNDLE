@@ -1,10 +1,10 @@
 import express from 'express'
-import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById, getEmployeesByProject, patchProjectById } from '../db/project.js'
+import { getProjects, createProject, getProjectById, deleteProjectById, updateProjectById, getEmployeesByProject, patchProjectById } from '../db/project'
 
 const router = express.Router()
 
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req:any, res:any, next) => {
   try {
     const projects = await getProjects()
     res.json(projects)
@@ -14,12 +14,12 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', async (req:any, res:any, next) => {
   const id = parseInt(req.params.id)
   try {
     const project = await getProjectById(id)
     if (!project.length) {
-      const err = new Error(`Project with id ${id} not found`)
+      const err:any = new Error(`Project with id ${id} not found`)
       err.status = 404
       next(err)
     } else {
@@ -30,12 +30,12 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', async (req:any, res:any, next) => {
   try {
-    const result = await createProject(req.body)
+    const result:any = await createProject(req.body)
     const projectId = result.rows[0].project_id
     res.status(200).json({ projectId, ...req.body })
-  } catch (err) {
+  } catch (err:any) {
     err.status = 400
     next(err)
   }
@@ -48,7 +48,7 @@ router.delete('/:id', async (req, res, next) => {
     if (response.rowCount) {
       res.status(204).json()
     } else {
-      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
+      const err:any = new Error(`No rows were affected, the project with id ${id} might not exist`)
       err.status = 404
       next(err)
     }
@@ -64,11 +64,11 @@ router.put('/:id', async (req, res, next) => {
     if (response.rowCount) {
       res.status(200).json(req.body)
     } else {
-      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
+      const err:any = new Error(`No rows were affected, the project with id ${id} might not exist`)
       err.status = 404
       next(err)
     }
-  } catch (err) {
+  } catch (err:any) {
     err.status = 400
     next(err)
   }
@@ -79,7 +79,7 @@ router.get('/:id/employee', async (req, res, next) => {
   try {
     const response = await getEmployeesByProject(id)
     if (!response.length) {
-      const err = new Error(`Project with id ${id} not found`)
+      const err:any = new Error(`Project with id ${id} not found`)
       err.status = 404
       next(err)
     } else {
@@ -97,11 +97,11 @@ router.patch('/:id', async (req, res, next) => {
     if (response.rowCount) {
       res.status(200).json(req.body)
     } else {
-      const err = new Error(`No rows were affected, the project with id ${id} might not exist`)
+      const err:any = new Error(`No rows were affected, the project with id ${id} might not exist`)
       err.status = 404
       next(err)
     }
-  } catch (err) {
+  } catch (err:any) {
     err.status = 400
     next(err)
   }
